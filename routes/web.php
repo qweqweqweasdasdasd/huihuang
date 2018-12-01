@@ -10,19 +10,21 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/alipay','Home\PayController@index');
-Route::post('/alipay','Home\PayController@Alipay');
+//Route::get('/alipay','Home\PayController@index');
+//Route::post('/alipay','Home\PayController@Alipay');
 
-//微信个人账号存款
+//显示微信二维码
 Route::get('/wechat','Home\PayController@show');
-//发起微信支付请求
-Route::post('/wechat','Home\PayController@wechat');
+//显示微信补单页面
+Route::get('/budan','Home\PayController@index');
+Route::post('/budan','Home\PayController@budan');
+
 //回调函数
-Route::post('/notify_url','Home\PayController@notify_url');
-Route::get('/return_url','Home\PayController@return_url');
+//Route::post('/notify_url','Home\PayController@notify_url');
+//Route::get('/return_url','Home\PayController@return_url');
 
 //对外提供的接口
-Route::get('/admin/main','Server\AdminStateController@main');
+Route::post('/admin/main','Server\AdminStateController@main');
 
 //模拟用户存款测试 
 //Route::get('/admin/getInfoWithUsername','Server\AdminStateController@getInfoWithUsername');
@@ -31,10 +33,17 @@ Route::get('/admin/main','Server\AdminStateController@main');
 //模拟登陆测试
 //Route::get('/admin/getCookieByLogin','Server\AdminStateController@getCookieByLogin');
 
+//常规的登录
+//Route::get('/login','Admin\LoginController@login');
+//Route::post('/login/check','Admin\LoginController@check');
 
-Route::get('/login','Admin\LoginController@login');
-Route::post('/login/check','Admin\LoginController@check');
+//使用手机号码进行登录
+Route::get('/tellogin','Admin\LoginController@tellogin');
+Route::post('/checkadmin','Admin\LoginController@checkadmin');
+Route::get('/','Admin\LoginController@redirect');
 
+//sendSMS
+Route::post('/sendSMS','Admin\LoginController@sendSMS');
 //生成随机字符串
 Route::get('/random','Server\StrController@random');
 
@@ -67,6 +76,14 @@ Route::group(['middleware'=>'islogin'],function(){
 		Route::get('/order/list','Admin\OrderController@list');
 		//手动补单修改状态
 		Route::post('/order/budan','Admin\OrderController@budan');
+
+		//二维码配置显示
+		Route::get('/qrcode/index','Admin\QRcodeController@index');
+		//二维码上传
+		Route::post('/qrcode/images','Admin\QRcodeController@images');
+
+		//补单列表显示
+		Route::get('/budan/list','Admin\BudanController@list');
 	});
 	
 	//管理本人密码显示

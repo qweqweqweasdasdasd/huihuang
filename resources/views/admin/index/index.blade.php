@@ -8,11 +8,12 @@
 			<dt><i class="Hui-iconfont">&#xe616;</i> 订单管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
-					<li><a data-href="/order/list" data-title="最新充值列表" href="javascript:void(0)">最新充值列表</a></li>
+					<li><a data-href="/order/list" data-title="最新充值列表" href="javascript:void(0)">充值列表详情</a></li>
+					<li><a data-href="/budan/list" data-title="补单列表" href="javascript:void(0)">补单列表</a></li>
 			</ul>
 		</dd>
 	</dl>
-		<dl id="menu-picture">
+		<!-- <dl id="menu-picture">
 			<dt><i class="Hui-iconfont">&#xe613;</i> 异常管理<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
@@ -21,13 +22,13 @@
 					<li><a data-href="picture-list.html" data-title="异常处理成功" href="javascript:void(0)">异常处理成功</a></li>
 			</ul>
 		</dd>
-	</dl>
+	</dl> -->
 		<dl id="menu-product">
-			<dt><i class="Hui-iconfont">&#xe620;</i> 网站配置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+			<dt><i class="Hui-iconfont">&#xe620;</i> 支付配置<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
 			<dd>
 				<ul>
-					<li><a data-href="product-brand.html" data-title="支付限额配置" href="javascript:void(0)">支付限额配置</a></li>
-					<li><a data-href="product-category.html" data-title="支付方式配置" href="javascript:void(0)">支付方式配置</a></li>
+					<li><a data-href="/qrcode/index" data-title="二维码配置" href="javascript:void(0)">二维码配置</a></li>
+					<!-- <li><a data-href="product-category.html" data-title="支付方式配置" href="javascript:void(0)">支付方式配置</a></li> -->
 			</ul>
 		</dd>
 	</dl>

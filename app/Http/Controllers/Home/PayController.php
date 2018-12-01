@@ -3,86 +3,64 @@
 namespace App\Http\Controllers\Home;
 
 use DB;
+use App\Pic;
 use App\Order;
+use App\Budan;
 use QL\QueryList;
 use Yansongda\Pay\Pay;
 use Yansongda\Pay\Log;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TjBudanRequest;
 use App\Http\Requests\PayAlipayRequest;
+use App\Http\Controllers\Server\AdminStateController;
 
 class PayController extends Controller
 {
-	//发起支付请求
-	public function Alipay(PayAlipayRequest $request)
+	//显示微信二维码静态页面
+	public function show()
 	{
-		
-		$order = [
-			'out_trade_no'=>date('ymdhis',time()).time(),
-			'total_amount'=>$request->get('money'),
-			'subject'=>$request->get('username'),
-		];
-		//保存订单信息	1 为下单
-		DB::table('order')->insert([
-			'order_no'=>$order['out_trade_no'],
-			'amount'=>$order['total_amount'],
-			'username'=>$order['subject'],
-			'addtime'=>date('Y-m-d H:i:s'),
-			'pay_type'=>'1'
-		]);
-
-		$alipay = Pay::alipay(config('pay.alipay'))->wap($order);
-
-		return $alipay->send();	
-	}
-	//回调函数
-	public function return_url(Request $request)
-	{
-		$data = Pay::alipay(config('pay.alipay'))->verify(); // 是的，验签就这么简单！
-
-		$order = Order::where('order_no',$data['out_trade_no'])->first();
-		$order->trade_no = $data['trade_no'];
-		$order->trade_time = $data['timestamp'];
-		$order->pay_type = '2';
-		$order->trade_amount = $data['total_amount'];
-		$order->save();
-
-		//监听事件
-		//event(new \App\Events\OrderUpdated($order));
-        // 订单号：$data->out_trade_no
-        // 支付宝交易号：$data->trade_no
-        // 订单总金额：$data->total_amount
-        return redirect('/alipay');
-	}
-	//回调函数
-	public function notify_url()
-	{
-		$alipay = Pay::alipay(config('pay.alipay'));
-    
-        try{
-            $data = $alipay->verify(); // 是的，验签就这么简单！
-            //dd($_GET);
-            // 请自行对 trade_status 进行判断及其它逻辑进行判断，在支付宝的业务通知中，只有交易通知状态为 TRADE_SUCCESS 或 TRADE_FINISHED 时，支付宝才会认定为买家付款成功。
-            // 1、商户需要验证该通知数据中的out_trade_no是否为商户系统中创建的订单号；
-            // 2、判断total_amount是否确实为该订单的实际金额（即商户订单创建时的金额）；
-            // 3、校验通知中的seller_id（或者seller_email) 是否为out_trade_no这笔单据的对应的操作方（有的时候，一个商户可能有多个seller_id/seller_email）；
-            // 4、验证app_id是否为该商户本身。
-            // 5、其它业务逻辑情况
-
-            Log::debug('Alipay notify', $data->all());
-        } catch (Exception $e) {
-            // $e->getMessage();
-        }
-
-        return $alipay->success()->send();// laravel 框架中请直接 `return $alipay->success()`
+		$pic = Pic::find(1);
+		return view('home.pay.show',compact('pic'));
 	}
 
-    //显示支付宝支付
+	//显示微信补单的页面
 	public function index()
-	{
+	{	
 		return view('home.pay.index');
 	}
 
-	
-	
+	//微信补单提交
+	public function budan(TjBudanRequest $request)
+	{
+		//查询订单号是否存在
+		if( !($order = Order::where('trade_no',$request->get('trade_no'))->first()) ){
+			return ['code'=>config('code.error'),'error'=>'查询没有该订单!'];
+		};
+		//核实该单号状态是否为 辉煌入款成功 false return error 	3 辉煌存款成功 6 补单成功
+		if($order->pay_type == 3 || $order->pay_type == 6){
+			return ['code'=>config('code.error'),'error'=>'该订单已经到账成功了呢!'];
+		}
+		//该单号存款是否为提交的金额 false return error
+		if($order->trade_amount != $request->get('money')){
+			return ['code'=>config('code.error'),'error'=>'输入金额与实际存款金额不符!'];
+		}
+		
+		//执行后台操作 如果失败的话 ,,失败的原因	//用户  //金额  //订单号
+		//实例化后台操作调用补单函数
+		$budan = new AdminStateController();
+		$res = $budan->huihuangbudan($request->get('input_username'),$request->get('money'),$request->get('trade_no'));
+		//返回结果
+		if($res['code'] == 0){
+			return ['code'=>config('code.error'),'error'=>$res['msg']];
+		};
+		if($res['code'] == 1){
+			app('log')->info("补单ok:".date('Y-m-d H:i:s',time()));
+			//生成补单的记录
+			Budan::create($request->all());
+			return ['code'=>config('code.error'),'error'=>$res['msg']];
+		};
+	}
+
+
 }

@@ -18,16 +18,16 @@
 		<button  class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜订单</button>
 	</div>
 	</form>
-	<div class="cl pd-5 bg-1 bk-gray mt-20" > 系统保存两个月的数据<!-- <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> </span>  --><span class="r">共有数据：<strong>{{$total}}</strong> 条</span> </div>
+	<div class="cl pd-5 bg-1 bk-gray mt-20" > 系统保存两个月的数据 ??未实现??<!-- <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> </span>  --><span class="r">共有数据：<strong>{{$total}}</strong> 条</span> </div>
 	<div class="mt-20">
 		<table class="table table-border table-bordered table-bg table-hover table-sort table-responsive">
 			<thead>
 				<tr class="text-c">
 					<th width="50">ID</th>
 					<th width="120">会员账号</th>
-					<th width="200">订单号</th>
-					<th width="250">支付宝订单</th>
-					<th width="100">支付金额</th>
+					<!-- <th width="200">订单号</th> -->
+					<th width="250">商户订单</th>
+					<!-- <th width="100">支付金额</th> -->
 					<th width="100">实付款金额</th>
 					<th width="150">支付时间</th>
 					<th >备注</th>
@@ -40,15 +40,16 @@
 				<tr class="text-c">
 					<td>{{$v->order_id}}</td>
 					<td><span class="label label-default radius">{{$v->username}}</span></td>
-					<td>{{$v->order_no}}</td>
+					<!-- <td>{{$v->order_no}}</td> -->
 					<td>{{$v->trade_no}}</td>
-					<td><span class="label label-default radius">{{$v->amount}}</span></td>
+					<!-- <td><span class="label label-default radius">{{$v->amount}}</span></td> -->
 					<td><span class="label label-default radius">{{$v->trade_amount}}</span></td>
 					<td>{{$v->trade_time}}</td>
 					<td>{{$v->tips}}</td>
 					<td class="td-status">{!! order_status($v->pay_type) !!}</td>
 					<td class="f-14 td-manage">
-						@if($v->pay_type != 3)
+						@if($v->pay_type == 3 || $v->pay_type == 6)
+						@else
 							<a style="text-decoration:none" class="btn btn-warning radius size-MINI budan"  href="javascript:;" title="手动补单">手动补单</a>
 						@endif
 					</td>

@@ -6,6 +6,8 @@
     "type": "project",
     "require": {
         "php": ">=5.6.4",
+        "aliyuncs/oss-sdk-php": "^2.3",
+        "flc/dysms": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "jaeger/querylist": "^4.0.4",
         "jaeger/querylist-ext-login": "^1.0",

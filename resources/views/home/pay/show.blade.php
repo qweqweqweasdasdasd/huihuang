@@ -1,43 +1,33 @@
-@extends('home/common/master')
-@section('content')
-<div class="header layout bg-blue">
-  <div class="line text-center">
-      <div class="x1 padding-small-top padding-small-bottom"></div>
-      <div class="x9 padding-top padding-bottom text-big text-white">在线充值</div>
-      <div class="x2 padding-small-top padding-small-bottom text-right"></div>
-  </div>
-</div>
-<div class="padding">
-    <form class="margin-big-top form-big" id="payform" action="/wechat" method="post">
-    	{{ csrf_field() }}
-	    <div class="form-group">
-	        <div class="label"><label>充值金额</label></div>
-	        <div class="field">
-	            <input type="tel" class="input" name="money" id="money" size="30" maxlength="6" />
-	            <div class="input-note text-big margin-top">最低充值金额为<span class="text-yellow"> 10.00 </span>元</div>
-	        </div>
-	    </div>
-	    <div class="form-group margin-top">
-	        <div class="label"><label>会员账号</label></div>
-	        <div class="field">
-	            <input name="username" id="username" class="input" type="text">
-	        </div>
-	        <div class="input-note text-big margin-top"><span class="text-yellow">*请填写正确的会员账号，否则无法及时到账!</span></div>
-        	@if (count($errors) > 0)
-			    <div class="text-yellow">
-			        <ul>
-			            @foreach ($errors->all() as $error)
-			                <li>{{ $error }}</li>
-			            @endforeach
-			        </ul>
-			    </div>
-			@endif
-	    </div>
-	    <div class="form-button">
-	        <button class="button button-block bg-blue margin-top" type="submit" id="toConfirm">微信充值</button>
-	    </div>
-    </form>
-</div>
-@endsection
-@section('my-js')
-@endsection
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta http-equiv="refresh" content="10">    <!-- 10秒刷新一下 -->
+    <title>微信支付</title>
+    <script src="https://cdn.bootcss.com/jquery/1.7/jquery.min.js"></script>
+    <style media="screen">
+        body, html {margin: 0;padding: 0;min-width: 320px;max-width: 640px;font-size: 62.5%;font-family:}
+        .header {background-color: #277ede;height: 4rem;line-height: 4rem;text-align: center;color: #fff;font-size: 1.6rem;font-weight: 800;}
+        .text-1 {color: red;font-size: 1.6rem;padding: 1rem;font-weight: 600;}
+        .img {padding: 1rem;}
+        .img img {display: block; width: 100%;margin: 0 auto;}
+    </style>
+</head>
+<body>
+    <header class="header">请长按二维码（识别图中二维码）即可充值</header>
+    <div class="text-1">1、注意：输入消费金额后，请点击下方<span style="color:#0000FF">【添加付款备注】</span>备注您的会员账号，否则无法到账！</div>
+    <div class="img">
+        <img src="{{$pic->picture}}" alt="no pic">
+    </div>
+    <div class="text-1">2、注意：输入消费金额后，请点击下方<span style="color:#0000FF">【添加付款备注】</span>备注您的会员账号，否则无法到账！</div>
+    <div class="img">
+        <img src="home/wechat/img/02.jpg" />
+    </div>
+    <div class="text-1">3、注意：在“添加付款备注”此处输入您的会员账号</div>
+    <div class="img">
+        <img src="home/wechat/img/03.jpg" />
+    </div>
+</body>
+</html>

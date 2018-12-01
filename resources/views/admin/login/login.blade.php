@@ -5,7 +5,7 @@
 @endsection
 @section('content')
 <input type="hidden" id="TenantId" name="TenantId" value="" />
-<div class="header"></div>
+<!-- <div class="header"></div> -->
 <div class="loginWraper">
   <div id="loginform" class="loginBox">
     <form class="form form-horizontal" >
@@ -23,8 +23,7 @@
           <input  name="password" type="password" placeholder="密码" class="input-text size-L">
           <!-- <br/>{{$errors->first('password')}} -->
         </div>
-      </div>
-      
+      </div>   
       <div class="row cl">
         <div class="formControls col-xs-8 col-xs-offset-3">
           <input class="input-text size-L" type="text" placeholder="验证码" onblur="if(this.value==''){this.value='验证码:'}" onclick="if(this.value=='验证码:'){this.value='';}" value="验证码:" style="width:150px;" name="code">  
@@ -39,7 +38,7 @@
     </form>
   </div>
 </div>
-<div class="footer">{{config('info.copyright')}}</div>
+<!-- <div class="footer">{{config('info.copyright')}}</div> -->
 @endsection
 @section('my-js')
 <script type="text/javascript">

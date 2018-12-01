@@ -23,7 +23,7 @@ class OrderController extends Controller
     //最新存款的列表显示
     public function list(Request $request)
     {
-    	//var_dump($request->all());
+    	error_reporting(0);
     	$whereDate['maxDate'] = !empty($request->get('maxDate')) ? $request->get('maxDate') : '';
     	$whereDate['minDate'] = $request->get('minDate') ? $request->get('minDate') : '';
     	$whereDate['order_no'] = $request->get('order_no') ? $request->get('order_no') : '';

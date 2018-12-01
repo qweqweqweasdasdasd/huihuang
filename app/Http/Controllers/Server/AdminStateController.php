@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Server;
 //use Imagick;	//laravel 需要 use 一下 安装使用
 use DB;
 use Log;
+use App\Order;
 use QL\QueryList;
 use GIFEndec\Decoder;	
 use GuzzleHttp\Client;
+use App\Common\AESMcrypt;
 use GIFEndec\IO\FileStream;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -20,24 +22,72 @@ use thiagoalessio\TesseractOCR\TesseractOCR;	//ocr
 class AdminStateController extends Controller
 {
 
-    //主要业务
-    public function main($username="test123",$trade_amount='1')
+    //主要存款业务
+    public function main(Request $request)	//$username="test123",$trade_amount='1'
     {
+
+    	app('log')->info("存款进来了:".date('Y-m-d H:i:s',time()));
+    	$data = urldecode(file_get_contents("php://input"));  // 取出POST的原始请求数据
+		//app('log')->info('data'.$data);
+		$aes = new AESMcrypt($bit = 128, $key = 'hdfkmhgnbd45812s', $iv = '7451236985412563', $mode = 'cbc');
+		$data = $aes->decrypt($data);
+		//原始数据
+		app('log')->info("原始数据:".$data);
+		$json = json_decode($data,true);
+		//写到日志
+		$trade_amount = $json['money'];
+		$username = trim($json['remarks']);
+		$number = $json['number'];
+		app('log')->info('金额:'.$trade_amount);
+
+		//app('log')->info("金额:".$trade_amount."会员".$username."订单号".$number);
+		//记录订单信息
+		$order_info = [
+			'username'=>$username,
+			'trade_amount'=>$trade_amount,
+			'pay_type'=>2,
+			'trade_no'=>$number,
+			'trade_time'=>date('Y-m-d H:i:s',time()),
+		];
+		Order::create($order_info);		//支付成功
     	//主体逻辑
-    	$result = $this->getInfoWithUsername($username,$trade_amount);	//获取用户信息
+    	$result = $this->getInfoWithUsername($username,$trade_amount,$number);	//获取用户信息
     	if($result['code'] == 0){
     		//返回接口错误代码
     		return ['code'=>config('code.error'),'msg'=>$result['msg']];
     	}
+
     	$json = $result['data'];
-    	$res = $this->huihuangcunkuan($json,$username,$trade_amount);
+    	$res = $this->huihuangcunkuan($json,$username,$trade_amount,$number);
     	if($res['code'] == 0){
     		//返回接口错误代码
-    		return ['code'=>config('code.error'),'msg'=>$result['msg']];
+    		return ['code'=>config('code.error'),'msg'=>$res['msg']];
     	}
-    	return ['code'=>config('code.success'),'恭喜你存款成功了哦'];
+    	return ['code'=>config('code.success'),'error'=>'恭喜你存款成功了哦'];
+    }
+
+    //补单业务
+    public function huihuangbudan($username,$trade_amount,$trade_no)
+    {
+    	app('log')->info("补单进来了:".date('Y-m-d H:i:s',time()));
+    	$result = $this->getInfoWithUsername($username,$trade_amount,$trade_no);	//获取用户信息
+    	if($result['code'] == 0){
+    		//返回接口错误代码
+    		return ['code'=>config('code.error'),'msg'=>$result['msg']];	//找不到会员账号
+    	}
+
+    	$json = $result['data'];
+    	$res = $this->huihuangcunkuan($json,$username,$trade_amount,$trade_no);
+    	if($res['code'] == 0){
+    		//返回接口错误代码
+    		return ['code'=>config('code.error'),'msg'=>$res['msg']];	//系统掉单联系人工
+    	}
+    	
+    	Order::where(['trade_no'=>$trade_no])->update(['pay_type'=>6,'username'=>$username]);	//修改了订单
+    	return ['code'=>config('code.success'),'msg'=>'恭喜你存款成功了哦'];
     }
     
+
     public function getCookieByLogin()
     {	
     	//header("content-type:image/jpeg");
@@ -60,7 +110,7 @@ class AdminStateController extends Controller
 		$jar = \QL\Services\HttpService::getCookieJar();	//获取到cookies
 		//dd($jar->toArray());
 		//把cookie保存到文件缓存内
-		$value = Cache::store('file')->put('cookies',$jar->toArray()[0]['Name'].'='.$jar->toArray()[0]['Value'],360);
+		$value = Cache::store('file')->put('cookies',$jar->toArray()[0]['Name'].'='.$jar->toArray()[0]['Value'],480);
 		//echo $code;
 	 	file_put_contents(public_path().'\code\code.gif',$code);	//写入gif
 		
@@ -147,7 +197,7 @@ class AdminStateController extends Controller
 	//highestDeposit:5000000	//最高存款金额
 	//lowestDeposit:10			//最低存款金额
     //查询存款用户的信息
-    public function getInfoWithUsername($username,$amount)
+    public function getInfoWithUsername($username,$amount,$trade_no)
     {
     	$ql = QueryList::getInstance();
     	$ql->post('http://fjjws.com/cash/man/manOnlineDeposit/queryAccountByName',[
@@ -166,7 +216,7 @@ class AdminStateController extends Controller
     		//模拟登陆获取cookie
 
     		$this->getCookieByLogin();
-    		$this->getInfoWithUsername($username,$amount);
+    		$this->getInfoWithUsername($username,$amount,$trade_no);
     		//模拟存款操作
     		app('log')->info('cookie失效重新获取cookie,时间: '.date('Y-m-d H:i:s',time()));
     	};
@@ -179,16 +229,19 @@ class AdminStateController extends Controller
     		//echo '会员账号错误!设置为掉单处理';
     		//exit();	//  会员账号错误(407)(手动)
     		app('log')->info('会员账号错误,时间: '.date('Y-m-d H:i:s',time()));
+    		//会员账号错误,设置为掉单处理
+    		Order::where('trade_no',$trade_no)->update(['pay_type'=>4,'tips'=>'会员账号错误!设置为掉单处理']);
     		return ['code'=>config('code.error'),'msg'=>'会员账号错误!设置为掉单处理'];
     	}
   		//存款动作
     	//$this->huihuangcunkuan($json,$username,$amount);
+
     	return ['code'=>config('code.success'),'data'=>$json];
     }
 
 
     //辉煌入款操作
-    public function huihuangcunkuan($json,$username,$amount)
+    public function huihuangcunkuan($json,$username,$amount,$trade_no)
     {
 
     	$ql = QueryList::getInstance();
@@ -198,7 +251,7 @@ class AdminStateController extends Controller
     		'accountNameList'=>$json->data->accountNameList,
     		'cashManOnlineTime'=>time(),	//间隔5秒
     		'accountName'=>$username,
-    		'depositType'=>'6',	// 1 为人工 6 为活动优惠
+    		'depositType'=>'1',	//  为人工 6 为活动优惠
     		'depositAmount'=>$amount,	//金额
     		'normalityAuditCheck'=>1,
     		'lowestDeposit'=>'1',		//最低存款金额
@@ -220,6 +273,8 @@ class AdminStateController extends Controller
     		/*echo json_encode($data);	//掉单(400) (手动) (异常)
     		exit();*/
     		app('log')->info('辉煌入款操作失败,时间: '.date('Y-m-d H:i:s',time()).'info:'.json_encode($data));
+    		//辉煌系统问题
+    		Order::where('trade_no',$trade_no)->update(['pay_type'=>5,'tips'=>'系统掉单']); //json_encode($data)
     		return ['code'=>config('code.error'),'msg'=>json_encode($data)];
     	}
     	if($data->status == 'success'){
@@ -227,6 +282,7 @@ class AdminStateController extends Controller
     		/*echo 'success';
     		exit();*/
     		app('log')->info('辉煌入款操作成功,时间: '.date('Y-m-d H:i:s',time()));
+    		Order::where('trade_no',$trade_no)->update(['pay_type'=>3,'tips'=>'支付ok']);
     		return ['code'=>config('code.success')];
     	}
     }

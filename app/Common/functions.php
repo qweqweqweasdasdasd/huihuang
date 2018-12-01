@@ -36,7 +36,7 @@ function permission_status($int)
     }
 }
 /**
- * 1 下单 2 支付成功 3辉煌入款成功 4支付失败 5辉煌入款失败
+ * 1 下单 2 支付成功 3辉煌入款成功 4辉煌查询后台失败 5辉煌入款失败
  *
  * @param  状态值
  * @return  
@@ -53,10 +53,13 @@ function order_status($int)
         return '<span class="label label-success radius">辉煌入款成功</span>';
     }
     if($int == 4){
-        return '<span class="label label-warning radius">支付失败</span>';
+        return '<span class="label label-warning radius">辉煌查询后台失败</span>';
     }
     if($int == 5){
         return '<span class="label label-danger radius">辉煌入款失败</span>';
+    }
+    if($int == 6){
+        return '<span class="label label-success radius">辉煌补单成功</span>';
     }
 }
 /**
