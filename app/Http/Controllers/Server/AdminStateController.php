@@ -41,6 +41,11 @@ class AdminStateController extends Controller
 		app('log')->info('金额:'.$trade_amount);
 
 		//app('log')->info("金额:".$trade_amount."会员".$username."订单号".$number);
+        //判断用户使用的存款方式
+        if(($number) == 'NO'){
+            $order_info['is_private'] = 'Y';    //是否为私人微信存款
+        }
+
 		//记录订单信息
 		$order_info = [
 			'username'=>$username,

@@ -18,7 +18,7 @@
 		<button  class="btn btn-success" type="submit"><i class="Hui-iconfont">&#xe665;</i> 搜订单</button>
 	</div>
 	</form>
-	<div class="cl pd-5 bg-1 bk-gray mt-20" > 系统保存两个月的数据 ??未实现??<!-- <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> </span>  --><span class="r">共有数据：<strong>{{$total}}</strong> 条</span> </div>
+	<div class="cl pd-5 bg-1 bk-gray mt-20" > 商户为空的情况是个人微信收款 <!-- <span class="l"><a href="javascript:;" onclick="datadel()" class="btn btn-danger radius"><i class="Hui-iconfont">&#xe6e2;</i> 批量删除</a> </span>  --><span class="r">共有数据：<strong>{{$total}}</strong> 条</span> </div>
 	<div class="mt-20">
 		<table class="table table-border table-bordered table-bg table-hover table-sort table-responsive">
 			<thead>
