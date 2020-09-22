@@ -28,7 +28,7 @@
 			<dd>
 				<ul>
 					<li><a data-href="/qrcode/index" data-title="二维码配置" href="javascript:void(0)">二维码配置</a></li>
-					<!-- <li><a data-href="product-category.html" data-title="支付方式配置" href="javascript:void(0)">支付方式配置</a></li> -->
+					
 			</ul>
 		</dd>
 	</dl>

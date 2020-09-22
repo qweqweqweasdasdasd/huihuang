@@ -93,6 +93,7 @@ class LoginController extends Controller
         //author 验证
         $nameAndPassword = $request->only(['mg_name','password']);
 
+
         if(!Auth::guard('back')->attempt($nameAndPassword)){
             //return back()->withErrors(['验证失败!']);
             return ['code'=>config('code.error'),'error'=>'用户名或者密码不正确!'];

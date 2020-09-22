@@ -19,6 +19,15 @@ Route::get('/wechat','Home\PayController@show');
 Route::get('/budan','Home\PayController@index');
 Route::post('/budan','Home\PayController@budan');
 
+// h5提交页面
+Route::get('paysubmit','Home\PayController@paysubmit')->name('paysubmit');
+
+// 显示以太坊地址
+Route::get('/showQr/{name?}','Home\PayController@showQr');
+
+// 检测用户和获取地址
+Route::post('getUsdtKey','Home\PayController@getUsdtKey');
+
 //回调函数
 //Route::post('/notify_url','Home\PayController@notify_url');
 //Route::get('/return_url','Home\PayController@return_url');
@@ -34,8 +43,8 @@ Route::post('/admin/main','Server\AdminStateController@main');
 //Route::get('/admin/getCookieByLogin','Server\AdminStateController@getCookieByLogin');
 
 //常规的登录
-//Route::get('/login','Admin\LoginController@login');
-//Route::post('/login/check','Admin\LoginController@check');
+Route::get('/login','Admin\LoginController@login');
+Route::post('/login/check','Admin\LoginController@check');
 
 //使用手机号码进行登录
 Route::get('/tellogin','Admin\LoginController@tellogin');

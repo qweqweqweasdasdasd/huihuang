@@ -17,6 +17,22 @@ function show_status($int,$str1,$str2)
 	}
 	
 }
+
+/**
+ * 解析 qwe147258-laohuihuang-23
+ */
+function returnStr($string = '')
+{
+    $arr = explode('-', $string);
+
+    if($arr[1] = 'laohuihuang'){
+        $arr[1] = '辉煌平台';
+    }
+    $str = $arr[0] .'<br/>所属平台:'. $arr[1];
+
+    return $str;
+}
+
 /**
  * 0 顶级权限 1 一级权限 2 二级权限
  *

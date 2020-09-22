@@ -14,9 +14,65 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\TjBudanRequest;
 use App\Http\Requests\PayAlipayRequest;
 use App\Http\Controllers\Server\AdminStateController;
+use App\Http\Controllers\Server\PayService;
+use Illuminate\Support\Facades\Redis;
 
 class PayController extends Controller
 {
+	public $payService;
+
+	public function __construct(PayService $payService)
+	{
+		$this->payService = $payService;
+	}
+
+	/**
+	 * 提交页面
+	 */
+	public function paysubmit()
+	{
+		return view('home.pay.submit');
+	}
+
+	/**
+	 * 显示以太坊地址
+	 */
+	public function showQr($name='')
+	{
+		$usdt = json_decode(Redis::get($name.'-usdt'),true);
+		
+		if(empty($usdt)){
+			return redirect()->route('paysubmit');
+		}
+		return view('home.pay.showQr',compact('usdt'));
+	}
+
+	/**
+	 * 检测用户是否存在并且获取到地址
+	 */
+	public function getUsdtKey(Request $request)
+	{
+		$uname = $request->input('username');
+		if(empty($uname)){
+			return ['code'=>-1,'msg'=>'用户不得为空'];
+		}
+		try {
+			// 是否存在该用户
+			$data = $this->payService->CheckUname($uname);
+			// 请求获取到usdt地址
+			$usdt = $this->payService->getUsdtKey($uname);
+		} catch (\Exception $e) {
+			return ['code'=>-1,'msg'=>$e->getMessage()];
+		}
+
+		if($usdt){
+			return ['code'=>1,'msg'=>'success','data'=>urlencode($uname) ];
+		}
+		return  ['code'=>-1,'msg'=>'请重新获取支付账号'];
+	}
+
+
+
 	//显示微信二维码静态页面
 	public function show()
 	{

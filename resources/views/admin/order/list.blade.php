@@ -41,9 +41,14 @@
 					<td>{{$v->order_id}}</td>
 					<td><span class="label label-default radius">{{$v->username}}</span></td>
 					<!-- <td>{{$v->order_no}}</td> -->
-					<td>{{$v->trade_no}}</td>
+					<td class="text-l" width="27%">
+						订单: {{$v->trade_no}}<br/>
+						usdt: {{$v->order_no}}<br/>
+					</td>
 					<!-- <td><span class="label label-default radius">{{$v->amount}}</span></td> -->
-					<td><span class="label label-default radius">{{$v->trade_amount}}</span></td>
+					<td>
+						{{$v->trade_amount}}
+					</td>
 					<td>{{$v->trade_time}}</td>
 					<td>{{$v->tips}}</td>
 					<td class="td-status">{!! order_status($v->pay_type) !!}</td>
